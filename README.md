@@ -1,1 +1,1 @@
-To find a job on DATA, this projected is started.
+To find a job on DATA, this projecte is started.
