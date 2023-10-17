@@ -1,17 +1,13 @@
 from sqlalchemy import create_engine, text
-#import os
 
 
-DB_HOST=aws.connect.psdb.cloud
-DB_USERNAME=yenrtgws1jzkgavb6jax
-DB_PASSWORD=************
-DB_NAME=davidliuwebappdatabase
-db_connection_string = os.environ['DB_CONNECTION_STRING']
+db_connection_string = r"mysql+mysqlconnector://xzxvku8wlo5ti70zxv3r:pscale_pw_f37kNG2LD4cGbVZYZqXfRoU2k8gDM79b7M7tEym3MBX@aws.connect.psdb.cloud/1stproj"
 
 engine = create_engine(
-  db_connection_string, 
-  connect_args={
-    "ssl": {
-      "ssl_ca": "/etc/ssl/cert.pem"
-    }
-  })
+  db_connection_string
+)
+
+# Test if the database is connected by executing a simple SQL query
+with engine.connect() as conn:
+    result = conn.execute(text("SELECT 1"))
+    print(result.fetchone())
