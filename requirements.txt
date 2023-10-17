@@ -1,2 +1,7 @@
-flask
+Flask
 gunicorn
+sqlalchemy
+pymysql
+pandas
+numpy
+pyecharts
