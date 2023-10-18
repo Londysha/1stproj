@@ -1,7 +1,7 @@
 Flask
 gunicorn
 sqlalchemy
-pymysql
+mysql-connector-python
 pandas
 numpy
 pyecharts
