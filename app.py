@@ -1,27 +1,42 @@
-from flask import Flask
+from flask import Flask, request
 from flask import render_template
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image
-import base64
+# import pandas as pd
+# import numpy as np
+# import matplotlib.pyplot as plt
+# from PIL import Image
+# import base64
+from db import engine
+from sqlalchemy import  text
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def index():
-    series = pd.Series([1, 3, 5, np.nan, 6, 8])
-    figuer = plt.figure()
-    ax = figuer.add_subplot(1, 1, 1)
-    ax.plot(series)
-    plt.savefig(r'./static/images/fig.png')
-    
-    fig=Image.open(r"./static/images/fig.png")
-     # Convert the image to base64
-    image_data = fig.tobytes()
-    base64_image = base64.b64encode(image_data).decode('utf-8')
+    # Get the IP of the visitor
+    ip = request.remote_addr
+    #count = 0
+    # Check if the IP is already in the database
+    with engine.connect() as conn:
+        conn.execute(text('''CREATE TABLE IF NOT EXISTS access
+                 (ip TEXT, count INTEGER)'''))
+        result = conn.execute(text("SELECT count FROM access WHERE ip={}".format(ip))).fetchone()
 
-    return render_template("home.html", fig=base64_image)
+        if result is None:
+            # If the IP is not in the database, insert it with a count of 1
+            conn.execute(text("INSERT INTO access VALUES (?, ?)"),(ip, count))
+            count = 1
+        else:
+            # If the IP is in the database, increment the count
+            count = result[0] + 1
+            conn.execute(text("UPDATE access SET count=? WHERE ip=?"), (count, ip))
+
+        # Commit the changes to the database
+        conn.commit()
+
+    return f"Hello, your IP is {ip}. Total accessions: {count}"
+
+
 
 
 
