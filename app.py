@@ -15,26 +15,29 @@ app = Flask(__name__)
 def index():
     # Get the IP of the visitor
     ip = request.remote_addr
-    #count = 0
+    ip_parts = ip.split(".")
+    ip_padded = ".".join([part.zfill(3) for part in ip_parts])
+    ip = ip_padded.replace(".", "")
     # Check if the IP is already in the database
     with engine.connect() as conn:
         conn.execute(text('''CREATE TABLE IF NOT EXISTS access
                  (ip TEXT, count INTEGER)'''))
-        result = conn.execute(text("SELECT count FROM access WHERE ip={}".format(ip))).fetchone()
+        result = conn.execute(text(f"SELECT count FROM access WHERE ip={ip}")).fetchone()
 
         if result is None:
             # If the IP is not in the database, insert it with a count of 1
-            conn.execute(text("INSERT INTO access VALUES (?, ?)"),(ip, count))
             count = 1
+            conn.execute(text(f"INSERT INTO access VALUES {ip, count}"))
+            
         else:
             # If the IP is in the database, increment the count
             count = result[0] + 1
-            conn.execute(text("UPDATE access SET count=? WHERE ip=?"), (count, ip))
+            conn.execute(text(f"UPDATE access SET count={count} WHERE ip={ip}"))
 
         # Commit the changes to the database
-        conn.commit()
-
-    return f"Hello, your IP is {ip}. Total accessions: {count}"
+        conn.commit()        
+    ip_display = ".".join([ip[:3], ip[3:6], ip[6:9], ip[9:]]) # Display the IP with dots
+    return f"Hello, your IP is {ip_display}. Total accessions: {count}"
 
 
 
