@@ -1,10 +1,9 @@
 from flask import Flask, request
 from flask import render_template
-# import pandas as pd
-# import numpy as np
-# import matplotlib.pyplot as plt
-# from PIL import Image
-# import base64
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from db import engine
 from sqlalchemy import  text
 
@@ -35,9 +34,12 @@ def index():
             conn.execute(text(f"UPDATE access SET count={count} WHERE ip={ip}"))
 
         # Commit the changes to the database
-        conn.commit()        
+        conn.commit()
+        counts=conn.execute(text(f"SELECT SUM(count) FROM access")).fetchone()[0]
+              
     ip_display = ".".join([ip[:3], ip[3:6], ip[6:9], ip[9:]]) # Display the IP with dots
-    return f"Hello, your IP is {ip_display}. Total accessions: {count}"
+    return f"Hello, your IP is {ip_display}. Total accessions: {counts}"
+    
 
 
 
